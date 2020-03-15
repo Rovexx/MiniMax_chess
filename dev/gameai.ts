@@ -18,9 +18,7 @@ class GameAI {
                 gameStateCopy.knightPositions[index] = move
 
                 // Save only the best move
-                // let moveEvaluation = Math.min(minEval, this.minimax(3, true, gameStateCopy, king, knights))
-                // bestMove = [index, moveEvaluation]
-                let evaluation = this.minimax(5, true, gameStateCopy, king, knights)
+                let evaluation = this.minimax(5, true, -Infinity , +Infinity, gameStateCopy, king, knights)
 				if (evaluation < minEval) {
 					minEval = evaluation
 					bestMove = [index, move]
@@ -37,7 +35,7 @@ class GameAI {
         console.log("AI move took " + (t1 - t0) + " milliseconds.");
     }
 
-    static minimax(depth:number, maximizingPlayer:boolean, game:GameState, king:King, knights:Knight[]) : number {
+    static minimax(depth:number, maximizingPlayer:boolean, alpha:number, beta:number, game:GameState, king:King, knights:Knight[]) : number {
         // No more depth to check
         if (depth === 0) {
             return game.getScore()[0]
@@ -60,7 +58,14 @@ class GameAI {
                 gameStateCopy.kingPos = move
 
                 // Get the highest evalutation for the next level down. Uses the currently being tested gameStateCopy
-                maxEval = Math.max(maxEval, this.minimax(depth -1, false, gameStateCopy, king, knights))
+                const evaluation = this.minimax(depth -1, false, alpha, beta, gameStateCopy, king, knights)
+                maxEval = Math.max(maxEval, evaluation)
+
+                // Pruning: If we had a better options earlier we can stop checking the rest
+                alpha = Math.max(alpha, evaluation)
+                if (beta <= alpha) {
+                    break;
+                }
             }
             return maxEval
         } else {
@@ -77,7 +82,14 @@ class GameAI {
                     gameStateCopy.knightPositions[index] = move
 
                     // Get the lowest evalutation for the next level down. Uses the currently being tested gameStateCopy
-                    minEval = Math.min(minEval, this.minimax(depth -1, true, gameStateCopy, king, knights))
+                    const evaluation = this.minimax(depth -1, true, alpha, beta, gameStateCopy, king, knights)
+                    minEval = Math.min(minEval, evaluation)
+
+                    // Pruning: If we had a better options earlier we can stop checking the rest
+                    beta = Math.min(beta, evaluation)
+                    if (beta <= alpha) {
+                        break;
+                    }
                 }
             }
             return minEval
