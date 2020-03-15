@@ -2,3 +2,4 @@
 symbols.json
 .vscode
 node_modules
+docs/js/**

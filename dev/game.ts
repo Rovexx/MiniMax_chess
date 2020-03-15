@@ -84,6 +84,7 @@ class Game {
                     // check win
                     if (this.gameState.getScore()[1]) {
                         this.gameOver = true;
+                        console.log("Won the game")
                     }
                 }
             }
@@ -101,7 +102,6 @@ class Game {
         // move knights
         for (let go of this.knights){
             go.update()
-
         }
 
         // AI needs to make a move if it is not the player's turn
@@ -113,6 +113,7 @@ class Game {
             // check lose
             if (this.gameState.getScore()[1]) {
                 this.gameOver = true;
+                console.log("Game over")
             }
         }
 
