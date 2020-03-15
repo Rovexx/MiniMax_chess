@@ -7,40 +7,24 @@ class GameAI {
     public static moveKnight(king:King, knights: Knight[], gameState:GameState) {
         let t0 = performance.now();
 
-        /*
-         // TODO: remove random move, amnd replace with AI move
-        // RANDOM MOVE - START ------------------
+        let minEval = +Infinity
+        let bestMove: any
 
-        console.log(king); // only to avoid error: 'king' is declared but its value is never read.
-
-        // choose knight to move
-        let i:number =  Math.floor(Math.random() * Math.floor(knights.length));
-
-        let legalMoves: [number, number][] = knights[i].getMoves();
-
-        console.log(legalMoves);
-
-        let j:number =  Math.floor(Math.random() * Math.floor(legalMoves.length));
-
-        knights[i].setPosition(legalMoves[j]);
-        gameState.knightPositions[i] = legalMoves[j];
-
-        // RANDOM MOVE - END   ------------------
-        */
-
-       let minEval = +Infinity
-       let bestMove: any
-
-       // Decide the best move for each knight
+        // Decide the best move for each knight
         for (const [index, knight] of knights.entries()) {
             // evaluate all possible moves for knight
-            for (let move of knight.getMoves()) {
+            for (const move of knight.getMoves()) {
                 let gameStateCopy = gameState.copy();
                 gameStateCopy.knightPositions[index] = move
 
                 // Save only the best move
-                let moveEvaluation = Math.min(minEval, this.miniMax(3, true, gameStateCopy, king, knights))
-                bestMove = [index, moveEvaluation]
+                // let moveEvaluation = Math.min(minEval, this.minimax(3, true, gameStateCopy, king, knights))
+                // bestMove = [index, moveEvaluation]
+                let evaluation = this.minimax(5, true, gameStateCopy, king, knights)
+				if (evaluation < minEval) {
+					minEval = evaluation
+					bestMove = [index, move]
+				}
             }
         }
 
@@ -53,7 +37,7 @@ class GameAI {
         console.log("AI move took " + (t1 - t0) + " milliseconds.");
     }
 
-    static miniMax(depth:number, maximizingPlayer:boolean, game:GameState, king:King, knights:Knight[]) : number {
+    static minimax(depth:number, maximizingPlayer:boolean, game:GameState, king:King, knights:Knight[]) : number {
         // No more depth to check
         if (depth === 0) {
             return game.getScore()[0]
@@ -76,7 +60,7 @@ class GameAI {
                 gameStateCopy.kingPos = move
 
                 // Get the highest evalutation for the next level down. Uses the currently being tested gameStateCopy
-                maxEval = Math.max(maxEval, this.miniMax(depth -1, false, gameStateCopy, king, knights))
+                maxEval = Math.max(maxEval, this.minimax(depth -1, false, gameStateCopy, king, knights))
             }
             return maxEval
         } else {
@@ -93,7 +77,7 @@ class GameAI {
                     gameStateCopy.knightPositions[index] = move
 
                     // Get the lowest evalutation for the next level down. Uses the currently being tested gameStateCopy
-                    minEval = Math.min(minEval, this.miniMax(depth -1, true, gameStateCopy, king, knights))
+                    minEval = Math.min(minEval, this.minimax(depth -1, true, gameStateCopy, king, knights))
                 }
             }
             return minEval

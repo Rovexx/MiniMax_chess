@@ -70,13 +70,11 @@ class Game {
 
         // only respond to input during player turn when no knights are moving, and not game over
         if ((this.playerTurn) && (!moving) && (!this.gameOver)) {
-            console.log(boardPos);
             let legalMoves: [number, number][] = this.king.getMoves();
 
             // check if requested move is a legal move
             for(let m of legalMoves) {
                 if (Board.samePosition(m, boardPos)) {
-                    console.log("legal move");
                     this.king.setPosition(boardPos);
                     this.gameState.kingPos = boardPos;
                     this.playerTurn = false;
@@ -105,11 +103,11 @@ class Game {
         }
 
         // AI needs to make a move if it is not the player's turn
-        if (!this.playerTurn) {
-            
+        if (!this.playerTurn && !this.king.moving) {
             GameAI.moveKnight(this.king, this.knights, this.gameState);
             this.playerTurn = true;
-
+        }
+        if (!this.king.moving) {
             // check lose
             if (this.gameState.getScore()[1]) {
                 this.gameOver = true;
